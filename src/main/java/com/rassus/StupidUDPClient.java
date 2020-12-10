@@ -3,16 +3,15 @@ package com.rassus;
 import com.google.gson.Gson;
 import com.rassus.models.Message;
 import com.rassus.socket.SimpleSimulatedDatagramSocket;
+import com.rassus.utils.DatagramPacketConverter;
 import com.rassus.utils.EmulatedSystemClock;
-import org.apache.commons.lang3.ArrayUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.stream.Collectors;
 
+@Slf4j
 public class StupidUDPClient {
     private static final int PORT = 4000;
     private static final double LOSS_RATE = 0.3;
@@ -22,8 +21,7 @@ public class StupidUDPClient {
 
     private final DatagramSocket socket;
     private final EmulatedSystemClock clock;
-    private Gson gson = new Gson();
-
+    private final Gson gson = new Gson();
 
     public StupidUDPClient() throws IOException {
         socket = new SimpleSimulatedDatagramSocket(PORT, LOSS_RATE, AVERAGE_DELAY);
@@ -32,8 +30,6 @@ public class StupidUDPClient {
 
     public static void main(String args[]) {
         try {
-            String message = "message";
-            System.out.println("Client sends: " + message);
             StupidUDPClient udpClient = new StupidUDPClient();
             udpClient.startServer();
 
@@ -42,26 +38,14 @@ public class StupidUDPClient {
                 Thread.sleep(1000L);
             }
         } catch (IOException | InterruptedException e) {
-            System.out.println("Catched exception: " + e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
     public void send(int measurement) throws IOException {
         vectorTime[index()]++;
         Message message = new Message(measurement, scalarTime(), vectorTime);
-        this.socket.send(toDatagramPacket(gson.toJson(message)));
-    }
-
-    private DatagramPacket toDatagramPacket(String s) throws UnknownHostException {
-        Byte[] bytes = s.chars()
-                .mapToObj(c -> (byte) c)
-                .collect(Collectors.toList())
-                .toArray(new Byte[s.length()]);
-
-        byte[] primitives = ArrayUtils.toPrimitive(bytes);
-
-        return new DatagramPacket(primitives, bytes.length,
-                InetAddress.getByName("localhost"), 5000);
+        this.socket.send(DatagramPacketConverter.toDatagramPacket(gson.toJson(message), PORT));
     }
 
     private long scalarTime() {
@@ -87,16 +71,18 @@ public class StupidUDPClient {
                 try {
                     socket.receive(rcvPacket);
                 } catch (IOException e) {
-                    System.out.println("Exception: " + e.getMessage());
+                    log.error(e.getMessage());
                     break;
                 }
 
-                String received = new String(rcvPacket.getData(), rcvPacket.getOffset(), rcvPacket.getLength());
-                Message message = gson.fromJson(received, Message.class);
+                Message message = gson.fromJson(DatagramPacketConverter.fromDatagramPacket(rcvPacket),
+                        Message.class);
                 int time = ++this.vectorTime[index()];
                 this.vectorTime = message.getVectorTime();
                 this.vectorTime[index()] = time;
-                System.out.println("Received " + received);
+                log.info("Measurement: " + message.getMeasurement());
+                log.info("Vector time: " + message.getVectorTime());
+                log.info("Scalar time: " + message.getMeasurement());
             }
             socket.close();
         });
