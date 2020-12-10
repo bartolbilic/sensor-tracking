@@ -1,8 +1,8 @@
 /*
- * This code has been developed at Department of Telecommunications,
- * Faculty of Electrical Engineering and Computing, University of Zagreb.
+ * This code has been developed at Departement of Telecommunications,
+ * Faculty of Electrical Eengineering and Computing, University of Zagreb.
  */
-package com.bartol.server.network;
+package com.rassus.client.network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -14,9 +14,9 @@ import java.util.logging.Logger;
 
 public class SimpleSimulatedDatagramSocket extends DatagramSocket {
 
-    private double lossRate;
-    private int averageDelay;
-    private Random random;
+    private final double lossRate;
+    private final int averageDelay;
+    private final Random random;
 
     //use this constructor for the server side (no timeout)
     public SimpleSimulatedDatagramSocket(int port, double lossRate, int averageDelay) throws SocketException, IllegalArgumentException {
@@ -27,7 +27,7 @@ public class SimpleSimulatedDatagramSocket extends DatagramSocket {
         this.averageDelay = averageDelay;
 
         //set time to wait for answer
-        this.setSoTimeout(0);
+        super.setSoTimeout(0);
     }
 
     //use this constructor for the client side (timeout = 4 * averageDelay)
@@ -38,7 +38,7 @@ public class SimpleSimulatedDatagramSocket extends DatagramSocket {
         this.averageDelay = averageDelay;
 
         //set time to wait for answer
-        this.setSoTimeout(4 * averageDelay);
+        super.setSoTimeout(4 * averageDelay);
     }
 
     @Override
@@ -54,14 +54,15 @@ public class SimpleSimulatedDatagramSocket extends DatagramSocket {
      */
     private class OutgoingDatagramPacket implements Runnable {
 
-        private DatagramPacket packet;
-        private long time;
+        private final DatagramPacket packet;
+        private final long time;
 
         private OutgoingDatagramPacket(DatagramPacket packet, long time) {
             this.packet = packet;
             this.time = time;
         }
 
+        @Override
         public void run() {
             try {
                 //simulate network delay
@@ -70,7 +71,7 @@ public class SimpleSimulatedDatagramSocket extends DatagramSocket {
             } catch (InterruptedException e) {
                 Thread.interrupted();
             } catch (IOException ex) {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SimulatedDatagramSocket.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

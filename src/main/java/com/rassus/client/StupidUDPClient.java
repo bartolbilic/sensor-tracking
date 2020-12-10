@@ -2,9 +2,9 @@
  * This code has been developed at Departement of Telecommunications,
  * Faculty of Electrical Eengineering and Computing, University of Zagreb.
  */
-package com.bartol.client;
+package com.rassus.client;
 
-import com.bartol.client.network.SimpleSimulatedDatagramSocket;
+import com.rassus.client.network.SimpleSimulatedDatagramSocket;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

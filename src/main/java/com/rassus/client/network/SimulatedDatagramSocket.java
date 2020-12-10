@@ -2,7 +2,7 @@
  * This code has been developed at Departement of Telecommunications,
  * Faculty of Electrical Eengineering and Computing, University of Zagreb.
  */
-package com.bartol.server.network;
+package com.rassus.client.network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -22,11 +22,10 @@ import java.util.logging.Logger;
  * to another may be routed differently, and may arrive in any order
  * depending on parameters of the simulated network.
  *
- *
- * @author  Krešimir Pripužić <kresimir.pripuzic@fer.hr>
- * @see     DatagramSocket
- * @see     DatagramPacket
- * @see     java.nio.channels.DatagramChannel
+ * @author Krešimir Pripužić <kresimir.pripuzic@fer.hr>
+ * @see DatagramSocket
+ * @see DatagramPacket
+ * @see java.nio.channels.DatagramChannel
  */
 public class SimulatedDatagramSocket extends DatagramSocket {
 
@@ -42,7 +41,7 @@ public class SimulatedDatagramSocket extends DatagramSocket {
     private int jitter;
     private int sendingDelay;
     /**
-     * Some atributes for internal use.
+     * Some attributes for internal use.
      */
     private Random random;
     private int cumulatedSendingDelay;
@@ -61,21 +60,18 @@ public class SimulatedDatagramSocket extends DatagramSocket {
      * with 0 as its argument to ensure the operation is allowed.
      * This could result in a SecurityException.
      *
-     *
-     * @see DatagramSocket#DatagramSocket()
-     * @see SecurityManager#checkListen
-     *
-     * @param lossRate Packet loss ratio of the simulated network.
+     * @param lossRate     Packet loss ratio of the simulated network.
      * @param sendingDelay Sending delay of packets in milliseconds.
      * @param averageDelay Average delay of packets in milliseconds, including sending delay.
-     * @param jitter Average delay variation of packets in milliseconds.
-     *
-     * @throws  SocketException  if the socket could not be opened,
-     *               or the socket could not bind to the specified local port.
-     * @throws  SecurityException  if a security manager exists and its
-     *             <code>checkListen</code> method doesn't allow the operation.
-     * @throws  IllegalArgumentException if <code>sendingDelay</code> or
-     * <code>averageDelay</code> is less or equal to zero.
+     * @param jitter       Average delay variation of packets in milliseconds.
+     * @throws SocketException          if the socket could not be opened,
+     *                                  or the socket could not bind to the specified local port.
+     * @throws SecurityException        if a security manager exists and its
+     *                                  <code>checkListen</code> method doesn't allow the operation.
+     * @throws IllegalArgumentException if <code>sendingDelay</code> or
+     *                                  <code>averageDelay</code> is less or equal to zero.
+     * @see DatagramSocket#DatagramSocket()
+     * @see SecurityManager#checkListen
      */
     public SimulatedDatagramSocket(double lossRate, int sendingDelay, int averageDelay, int jitter) throws SocketException, IllegalArgumentException {
         random = new Random();
@@ -91,7 +87,7 @@ public class SimulatedDatagramSocket extends DatagramSocket {
         this.jitter = jitter;
 
         //set time to wait for answer
-        this.setSoTimeout(2 * (jitter + averageDelay));
+        super.setSoTimeout(2 * (jitter + averageDelay));
     }
 
     /**
@@ -113,24 +109,19 @@ public class SimulatedDatagramSocket extends DatagramSocket {
      * <code>p.getPort()</code>. Each call to a security manager method
      * could result in a SecurityException if the operation is not allowed.
      *
-     * @see        DatagramSocket#send
-     * @see        DatagramPacket
-     * @see        SecurityManager#checkMulticast(InetAddress)
-     * @see        SecurityManager#checkConnect
-
      * @param packet the <code>DatagramPacket</code> to be sent.
-     * @throws  IOException  if an I/O error occurs.
-     * @throws  SecurityException  if a security manager exists and its
-     *             <code>checkMulticast</code> or <code>checkConnect</code>
-     *             method doesn't allow the send.
-     * @throws  PortUnreachableException may be thrown if the socket is connected
-     *             to a currently unreachable destination. Note, there is no
-     *             guarantee that the exception will be thrown.
-     * @throws  java.nio.channels.IllegalBlockingModeException
-     *             if this socket has an associated channel,
-     *             and the channel is in non-blocking mode.
-     * @throws  IllegalArgumentException if the socket is connected,
-     *             and connected address and packet address differ.
+     * @throws IOException                                    if an I/O error occurs.
+     * @throws SecurityException                              if a security manager exists and its
+     *                                                        <code>checkMulticast</code> or <code>checkConnect</code>
+     *                                                        method doesn't allow the send.
+     * @throws java.nio.channels.IllegalBlockingModeException if this socket has an associated channel,
+     *                                                        and the channel is in non-blocking mode.
+     * @throws IllegalArgumentException                       if the socket is connected,
+     *                                                        and connected address and packet address differ.
+     * @see DatagramSocket#send
+     * @see DatagramPacket
+     * @see SecurityManager#checkMulticast(InetAddress)
+     * @see SecurityManager#checkConnect
      */
     @Override
     public void send(DatagramPacket packet) throws IOException {
@@ -146,14 +137,15 @@ public class SimulatedDatagramSocket extends DatagramSocket {
      */
     private class OutgoingDatagramPacket implements Runnable {
 
-        private DatagramPacket packet;
-        private long time;
+        private final DatagramPacket packet;
+        private final long time;
 
         private OutgoingDatagramPacket(DatagramPacket packet, long time) {
             this.packet = packet;
             this.time = time;
         }
 
+        @Override
         public void run() {
             try {
                 //simulate sending delay
