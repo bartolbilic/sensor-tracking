@@ -2,7 +2,7 @@
  * This code has been developed at Department of Telecommunications,
  * Faculty of Electrical Engineering and Computing, University of Zagreb.
  */
-package com.rassus.client.network;
+package com.rassus.socket;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

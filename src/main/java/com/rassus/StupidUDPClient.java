@@ -4,7 +4,7 @@
  */
 package com.rassus;
 
-import com.rassus.client.network.SimpleSimulatedDatagramSocket;
+import com.rassus.socket.SimpleSimulatedDatagramSocket;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -55,7 +55,6 @@ public class StupidUDPClient {
         System.out.println("");
 
         StringBuffer receiveString = new StringBuffer();
-
         while (true) {
             // create a datagram packet for receiving data
             DatagramPacket rcvPacket = new DatagramPacket(rcvBuf, rcvBuf.length);
