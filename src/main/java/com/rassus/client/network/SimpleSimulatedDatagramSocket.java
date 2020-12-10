@@ -1,6 +1,6 @@
 /*
- * This code has been developed at Departement of Telecommunications,
- * Faculty of Electrical Eengineering and Computing, University of Zagreb.
+ * This code has been developed at Department of Telecommunications,
+ * Faculty of Electrical Engineering and Computing, University of Zagreb.
  */
 package com.rassus.client.network;
 
@@ -71,7 +71,7 @@ public class SimpleSimulatedDatagramSocket extends DatagramSocket {
             } catch (InterruptedException e) {
                 Thread.interrupted();
             } catch (IOException ex) {
-                Logger.getLogger(SimulatedDatagramSocket.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SimpleSimulatedDatagramSocket.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
