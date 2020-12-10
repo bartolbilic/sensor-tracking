@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Arrays;
 
 @Slf4j
 public class StupidUDPClient {
@@ -33,19 +34,24 @@ public class StupidUDPClient {
             StupidUDPClient udpClient = new StupidUDPClient();
             udpClient.startServer();
 
-            for (int i = 0; i < 5000; i++) {
-                udpClient.send(564);
-                Thread.sleep(1000L);
+            while (true) {
+                for (int i = 0; i < 4; i++) {
+                    if (i != udpClient.index()) {
+                        log.info("Sending measurement to port " + PORTS[i] + ": " + 544);
+                        udpClient.send(544, PORTS[i]);
+                    }
+                }
+                Thread.sleep(1000);
             }
         } catch (IOException | InterruptedException e) {
             log.error(e.getMessage());
         }
     }
 
-    public void send(int measurement) throws IOException {
+    public void send(int measurement, int port) throws IOException {
         vectorTime[index()]++;
         Message message = new Message(measurement, scalarTime(), vectorTime);
-        this.socket.send(DatagramPacketConverter.toDatagramPacket(gson.toJson(message), PORT));
+        this.socket.send(DatagramPacketConverter.toDatagramPacket(gson.toJson(message), port));
     }
 
     private long scalarTime() {
@@ -81,7 +87,7 @@ public class StupidUDPClient {
                 this.vectorTime = message.getVectorTime();
                 this.vectorTime[index()] = time;
                 log.info("Measurement: " + message.getMeasurement());
-                log.info("Vector time: " + message.getVectorTime());
+                log.info("Vector time: " + Arrays.toString(message.getVectorTime()));
                 log.info("Scalar time: " + message.getMeasurement());
             }
             socket.close();
