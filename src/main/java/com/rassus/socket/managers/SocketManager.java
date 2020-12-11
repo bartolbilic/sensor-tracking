@@ -45,7 +45,9 @@ public class SocketManager {
     }
 
     public void setToConfirmed(String id) {
-        confirmedMessages.put(id, sentMessages.remove(id));
+        if (sentMessages.containsKey(id)) {
+            confirmedMessages.put(id, sentMessages.remove(id));
+        }
     }
 
     public boolean isNewMessage(Message message) {
@@ -68,10 +70,10 @@ public class SocketManager {
         return clock.currentTimeMillis();
     }
 
-    public synchronized void setVectorClocks(int[] vectorClocks) {
+    public void setVectorClocks(int[] vectorClocks) {
         for (int i = 0; i < vectorClocks.length; i++) {
             if (i != index()) {
-                vectorClocks[i] = Math.max(this.vectorClocks.get(i), vectorClocks[i]);
+                this.vectorClocks.set(i, Math.max(this.vectorClocks.get(i), vectorClocks[i]));
             }
         }
         incrementLogicalClock();

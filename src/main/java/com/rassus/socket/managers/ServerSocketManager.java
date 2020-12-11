@@ -64,9 +64,8 @@ public class ServerSocketManager {
         socketManager.setToConfirmed(message.getId());
     }
 
-    private synchronized void processMessage(Message message) throws IOException {
+    private void processMessage(Message message) throws IOException {
         socketManager.setVectorClocks(message.getVectorTime());
-
         if (message.getType() == Type.REQUEST) {
             processRequest(message);
         }
@@ -102,7 +101,8 @@ public class ServerSocketManager {
     }
 
     private void sortByLogicalClock() {
-        List<Message> allMessages = new ArrayList<>(socketManager.getConfirmedMessages().values());
+        List<Message> allMessages = new ArrayList<>();
+        allMessages.addAll(socketManager.getConfirmedMessages().values());
         allMessages.addAll(socketManager.getSentMessages().values());
 
         VectorTimeComparator comparator = new VectorTimeComparator();
@@ -128,12 +128,12 @@ public class ServerSocketManager {
                     .append(" Send to: " )
                     .append(message.getPort())
                     .append("\n");
+            log.info(sb.toString());
+            sb = new StringBuilder();
         }
-
-        log.info(sb.toString());
     }
 
-    private synchronized void sort() {
+    private void sort() {
         while (true) {
             try {
                 Thread.sleep(5000);
