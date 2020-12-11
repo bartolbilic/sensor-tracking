@@ -2,14 +2,14 @@ package com.rassus.socket.managers;
 
 import com.google.gson.Gson;
 import com.rassus.models.Message;
+import com.rassus.models.Type;
 import com.rassus.utils.DatagramPacketConverter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.UUID;
 
-import static com.rassus.constants.SocketManagerConstants.INTERVAL;
-import static com.rassus.constants.SocketManagerConstants.PORTS;
+import static com.rassus.constants.SocketManagerConstants.*;
 
 @Slf4j
 public class ClientSocketManagerImpl implements ClientSocketManager {
@@ -22,6 +22,10 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
 
     @Override
     public void send(Message message) throws IOException {
+        log.info("[" + PORT + "] SEND " + message.getType() + "-" + message.getId() + " TO " + message.getPort());
+        //log.info("[" + PORT + "] SEND: " + socketManager.getSentMessages().size() +
+        //        ", CONFIRMED: " + socketManager.getConfirmedMessages().size() +
+        //        ", RATIO: " + ((double) socketManager.getConfirmedMessages().size() / (socketManager.getSentMessages().size() + 1)));
         socketManager.getSocket()
                 .send(DatagramPacketConverter.toDatagramPacket(gson.toJson(message),
                         message.getPort()));
@@ -44,6 +48,7 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
 
     private void resendMessagesToPeers() throws IOException {
         for (Message message : socketManager.getSentMessages().values()) {
+            socketManager.incrementLogicalClock();
             send(message);
         }
     }
@@ -65,6 +70,7 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
                 .id(UUID.randomUUID().toString())
                 .host("localhost")
                 .port(port)
+                .type(Type.REQUEST)
                 .measurement(measurement)
                 .scalarTime(socketManager.getPhysicalClock())
                 .vectorTime(socketManager.getVectorClocks())

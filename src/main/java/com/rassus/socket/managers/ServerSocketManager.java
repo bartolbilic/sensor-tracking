@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.net.DatagramPacket;
 
+import static com.rassus.constants.SocketManagerConstants.PORT;
+
 @Slf4j
 public class ServerSocketManager {
     private final SocketManager socketManager;
@@ -34,17 +36,28 @@ public class ServerSocketManager {
 
     private void processRequest(Message message) throws IOException {
         if (socketManager.isNewMessage(message)) {
+            log.info("[" + PORT + "] RECV NEW MESSAGE-" + message.getId());
             socketManager.setToConfirmed(message);
+        } else {
+            log.info("[" + PORT + "] RECV OLD MESSAGE-" + message.getId());
         }
-        socketManager.setVectorClocks(message.getVectorTime());
-        clientSocketManager.send(message);
+
+        clientSocketManager.send(Message.builder()
+                .id(message.getId())
+                .type(Type.CONFIRMATION)
+                .port(message.getPort())
+                .vectorTime(message.getVectorTime())
+                .build());
     }
 
     private void processConfirmation(Message message) {
+        log.info("[" + PORT + "] RECV CONFIRMATION-" + message.getId());
         socketManager.setToConfirmed(message.getId());
     }
 
     private void processMessage(Message message) throws IOException {
+        socketManager.setVectorClocks(message.getVectorTime());
+
         if (message.getType() == Type.REQUEST) {
             processRequest(message);
         }

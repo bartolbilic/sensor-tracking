@@ -42,7 +42,7 @@ public class SocketManager {
     }
 
     public void setToConfirmed(String id) {
-        confirmedMessages.put(id, sentMessages.get(id));
+        confirmedMessages.put(id, sentMessages.remove(id));
     }
 
     public boolean isNewMessage(Message message) {
