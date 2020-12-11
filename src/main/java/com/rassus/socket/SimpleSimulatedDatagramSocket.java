@@ -9,12 +9,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SimpleSimulatedDatagramSocket extends DatagramSocket {
-
     private final double lossRate;
     private final int averageDelay;
     private final Random random;
 
-    //use this constructor for the server side (no timeout)
     public SimpleSimulatedDatagramSocket(int port, double lossRate, int averageDelay) throws SocketException, IllegalArgumentException {
         super(port);
         random = new Random();
@@ -22,24 +20,17 @@ public class SimpleSimulatedDatagramSocket extends DatagramSocket {
         this.lossRate = lossRate;
         this.averageDelay = averageDelay;
 
-        //set time to wait for answer
         super.setSoTimeout(0);
     }
 
-
     @Override
-    public void send(DatagramPacket packet) throws IOException {
+    public void send(DatagramPacket packet) {
         if (random.nextDouble() >= lossRate) {
-            //delay is uniformely distributed between 0 and 2*averageDelay
             new Thread(new OutgoingDatagramPacket(packet, (long) (2 * averageDelay * random.nextDouble()))).start();
         }
     }
 
-    /**
-     * Inner class for internal use.
-     */
     private class OutgoingDatagramPacket implements Runnable {
-
         private final DatagramPacket packet;
         private final long time;
 
@@ -51,7 +42,6 @@ public class SimpleSimulatedDatagramSocket extends DatagramSocket {
         @Override
         public void run() {
             try {
-                //simulate network delay
                 Thread.sleep(time);
                 SimpleSimulatedDatagramSocket.super.send(packet);
             } catch (InterruptedException e) {
