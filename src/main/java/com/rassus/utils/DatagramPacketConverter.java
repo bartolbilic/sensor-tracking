@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.stream.Collectors;
 
+import static com.rassus.constants.SocketManagerConstants.HOST;
+
 public class DatagramPacketConverter {
 
     public static DatagramPacket toDatagramPacket(String s, int port) throws UnknownHostException {
@@ -18,7 +20,7 @@ public class DatagramPacketConverter {
         byte[] primitives = ArrayUtils.toPrimitive(bytes);
 
         return new DatagramPacket(primitives, bytes.length,
-                InetAddress.getByName("localhost"), port);
+                InetAddress.getByName(HOST), port);
     }
 
     public static String fromDatagramPacket(DatagramPacket packet) {

@@ -68,7 +68,7 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
     private Message toMessage(int measurement, int port) {
         return Message.builder()
                 .id(UUID.randomUUID().toString())
-                .host("localhost")
+                .host(HOST)
                 .port(port)
                 .type(Type.REQUEST)
                 .measurement(measurement)
