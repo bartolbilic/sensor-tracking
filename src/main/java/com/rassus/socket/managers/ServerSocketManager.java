@@ -121,6 +121,8 @@ public class ServerSocketManager {
                     .append(message.getScalarTime())
                     .append(" Logical time: ")
                     .append(Arrays.toString(message.getVectorTime()))
+                    .append(" Send to: " )
+                    .append(message.getPort())
                     .append("\n");
         }
 

@@ -8,6 +8,7 @@ import com.rassus.utils.MeasurementReader;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static com.rassus.constants.SocketManagerConstants.*;
@@ -35,10 +36,10 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
     }
 
     private void send(float data, int port) throws IOException {
+        socketManager.incrementLogicalClock();
         Message message = toMessage(data, port);
         send(message);
         socketManager.setToSent(message);
-        socketManager.incrementLogicalClock();
     }
 
     private void sendMessagesToPeers() throws IOException {
@@ -76,7 +77,8 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
                 .type(Type.REQUEST)
                 .measurement(measurement)
                 .scalarTime(socketManager.getPhysicalClock())
-                .vectorTime(socketManager.getVectorClocks())
+                .vectorTime(Arrays.copyOf(socketManager.getVectorClocks(),
+                        socketManager.getVectorClocks().length))
                 .build();
     }
 
