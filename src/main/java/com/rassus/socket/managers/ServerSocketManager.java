@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.rassus.constants.SocketManagerConstants.PORT;
@@ -63,7 +64,7 @@ public class ServerSocketManager {
         socketManager.setToConfirmed(message.getId());
     }
 
-    private void processMessage(Message message) throws IOException {
+    private synchronized void processMessage(Message message) throws IOException {
         socketManager.setVectorClocks(message.getVectorTime());
 
         if (message.getType() == Type.REQUEST) {
@@ -132,7 +133,7 @@ public class ServerSocketManager {
         log.info(sb.toString());
     }
 
-    private void sort() {
+    private synchronized void sort() {
         while (true) {
             try {
                 Thread.sleep(5000);

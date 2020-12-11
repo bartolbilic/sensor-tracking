@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import static com.rassus.constants.SocketManagerConstants.*;
 
@@ -57,7 +58,7 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
         }
     }
 
-    private void run() {
+    private synchronized void run() {
         while (true) {
             try {
                 sendMessagesToPeers();
@@ -77,9 +78,16 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
                 .type(Type.REQUEST)
                 .measurement(measurement)
                 .scalarTime(socketManager.getPhysicalClock())
-                .vectorTime(Arrays.copyOf(socketManager.getVectorClocks(),
-                        socketManager.getVectorClocks().length))
+                .vectorTime(copy(socketManager.getVectorClocks()))
                 .build();
+    }
+
+    private int[] copy(AtomicIntegerArray array) {
+        int[] copy = new int[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            copy[i] = array.get(i);
+        }
+        return copy;
     }
 
     @Override

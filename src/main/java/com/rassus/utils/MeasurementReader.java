@@ -58,7 +58,7 @@ public class MeasurementReader {
     private String readHeaders() {
         String line = null;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(new File("/Users/bartol/IdeaProjects/sensor-tracking/src/main/resources/data.csv")))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(new File("/Users/luka/Faks/semes1ar/rassus/zad2/sensor-tracking/src/main/resources/data.csv")))) {
             line = reader.readLine();
         } catch (IOException ignored) {
 
@@ -72,7 +72,7 @@ public class MeasurementReader {
         //System.out.println("Line number generated: " + lineNumber);
         String line = null;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(new File("/Users/bartol/IdeaProjects/sensor-tracking/src/main/resources/data.csv")))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(new File("/Users/luka/Faks/semes1ar/rassus/zad2/sensor-tracking/src/main/resources/data.csv")))) {
             for (int i = 0; i <= lineNumber; i++) {
                 line = reader.readLine();
             }

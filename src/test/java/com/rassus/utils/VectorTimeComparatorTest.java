@@ -11,10 +11,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class VectorTimeComparatorTest {
 
-    int[] a = {0, 34, 54, 12};
-    int[] b = {1, 34, 54, 5};
-    int[] c = {0, 34, 32, 12};
-    int[] d = {0, 34, 54, 12};
+    int[] a = {30, 30, 30, 30};
+    int[] b = {0, 0, 2, 0};
+    int[] c = {3, 0, 2, 0};
+    int[] d = {0, 0, 2, 1};
+
+
 
     private ArrayList<int[]> list = Lists.newArrayList(a, b, c, d);
 

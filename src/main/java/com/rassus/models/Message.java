@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.concurrent.atomic.AtomicIntegerArray;
+
 @Data
 @AllArgsConstructor
 @Builder

@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import static com.rassus.constants.SocketManagerConstants.*;
 
@@ -18,16 +21,16 @@ public class SocketManager {
     private final DatagramSocket socket;
 
     @Getter
-    private final int[] vectorClocks = {0, 0, 0, 0};
+    private final AtomicIntegerArray vectorClocks = new AtomicIntegerArray(new int[]{0, 0, 0, 0});
 
     @Getter
     private final EmulatedSystemClock clock = new EmulatedSystemClock();
 
     @Getter
-    private final Map<String, Message> confirmedMessages = new HashMap<>();
+    private final Map<String, Message> confirmedMessages = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<String, Message> sentMessages = new HashMap<>();
+    private final Map<String, Message> sentMessages = new ConcurrentHashMap<>();
 
     public SocketManager() throws IOException {
         this.socket = new SimpleSimulatedDatagramSocket(PORT, LOSS_RATE, AVERAGE_DELAY);
@@ -49,15 +52,15 @@ public class SocketManager {
         return !confirmedMessages.containsKey(message.getId());
     }
 
-    public int getLogicalClock() {
-        return vectorClocks[index()];
+    public synchronized int getLogicalClock() {
+        return vectorClocks.get(index());
     }
 
-    public void setLogicalClock(int value) {
-        vectorClocks[index()] = value;
+    public synchronized void setLogicalClock(int value) {
+        vectorClocks.set(index(), value);
     }
 
-    public void incrementLogicalClock() {
+    public synchronized void incrementLogicalClock() {
         setLogicalClock(getLogicalClock() + 1);
     }
 
@@ -65,10 +68,10 @@ public class SocketManager {
         return clock.currentTimeMillis();
     }
 
-    public void setVectorClocks(int[] vectorClocks) {
+    public synchronized void setVectorClocks(int[] vectorClocks) {
         for (int i = 0; i < vectorClocks.length; i++) {
             if (i != index()) {
-                vectorClocks[i] = Math.max(this.vectorClocks[i], vectorClocks[i]);
+                vectorClocks[i] = Math.max(this.vectorClocks.get(i), vectorClocks[i]);
             }
         }
         incrementLogicalClock();
