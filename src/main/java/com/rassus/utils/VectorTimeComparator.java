@@ -9,31 +9,48 @@ public class VectorTimeComparator implements Comparator<int[]> {
             throw new RuntimeException("Vector time lengths don't match");
         }
 
-        boolean isDetermined = false;
-        boolean isBefore = false;
+        int[] results = new int[4];
 
         for (int i = 0; i < t1.length; i++) {
-            int time1 = t1[i];
-            int time2 = t2[i];
 
-            if (!isDetermined) {
-                if (time1 < time2) {
-                    isBefore = true;
-                    isDetermined = true;
-                }
-
-                if (time1 > time2) {
-                    isBefore = false;
-                    isDetermined = true;
-                }
+            if (t1[i] == t2[i]) {
+                results[i] = 0;
             }
 
-            if (isDetermined && isBefore && time1 > time2 ||
-                    isDetermined && !isBefore && time1 < time2) {
-                return 0;
+            if (t1[i] < t2[i]) {
+                results[i] = -1;
+            }
+
+            if (t1[i] > t2[i]) {
+                results[i] = 1;
             }
         }
 
-        return isBefore ? -1 : 1;
+        boolean hasNegative = false;
+        boolean hasPositive = false;
+
+        for (int i = 0; i < 4; i++) {
+            if (results[i] < 0) {
+                hasNegative = true;
+            }
+
+            if (results[i] > 0) {
+                hasPositive = true;
+            }
+        }
+
+        if (hasNegative && hasPositive) {
+            return 0;
+        }
+
+        if (hasNegative) {
+            return -1;
+        }
+
+        if (hasPositive) {
+            return 1;
+        }
+
+        return 0;
     }
 }

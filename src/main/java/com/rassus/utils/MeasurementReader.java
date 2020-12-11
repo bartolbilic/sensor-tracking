@@ -14,7 +14,7 @@ public class MeasurementReader {
     public Measurement getMeasurement(String key) {
         return getMeasurements().stream()
                 .filter(t -> t.getName().equals(key))
-                .findFirst().orElse(null);
+                .findFirst().orElse(new Measurement(key, 0F));
     }
 
     private List<Measurement> getMeasurements() {
@@ -37,6 +37,9 @@ public class MeasurementReader {
         String valueString = readLine();
 
         String[] headers = headerString.split(",");
+        if(valueString == null) {
+            System.out.println("UZAS TESKI");
+        }
         String[] values = valueString.split(",");
 
         for (int i = 0; i < headers.length; i++) {
@@ -73,8 +76,8 @@ public class MeasurementReader {
             for (int i = 0; i <= lineNumber; i++) {
                 line = reader.readLine();
             }
-        } catch (IOException ignored) {
-
+        } catch (Exception e) {
+            System.out.println("Watafak " + e.getMessage());
         }
 
         return line;
@@ -84,7 +87,7 @@ public class MeasurementReader {
     private int generateLineNumber() {
         int timeElapsedSeconds = Stopwatch.getTimeElapsedSeconds();
         //System.out.println("Time elapsed in seconds: " + timeElapsedSeconds);
-        return timeElapsedSeconds % 100 + 2;
+        return timeElapsedSeconds % 100 + 1;
     }
 
 

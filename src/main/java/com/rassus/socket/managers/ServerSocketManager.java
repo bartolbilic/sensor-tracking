@@ -54,6 +54,7 @@ public class ServerSocketManager {
                 .type(Type.CONFIRMATION)
                 .port(message.getPort())
                 .vectorTime(message.getVectorTime())
+                .scalarTime(message.getScalarTime())
                 .build());
     }
 
@@ -91,6 +92,7 @@ public class ServerSocketManager {
         allMessages.addAll(socketManager.getSentMessages().values());
 
         List<Message> sorted = allMessages.stream()
+                .filter(t -> t != null)
                 .sorted(Comparator.comparingLong(Message::getScalarTime))
                 .collect(Collectors.toList());
 
@@ -104,6 +106,7 @@ public class ServerSocketManager {
 
         VectorTimeComparator comparator = new VectorTimeComparator();
         List<Message> sorted = allMessages.stream()
+                .filter(t -> t != null)
                 .sorted((t1, t2) -> comparator.compare(t1.getVectorTime(), t2.getVectorTime()))
                 .collect(Collectors.toList());
 
