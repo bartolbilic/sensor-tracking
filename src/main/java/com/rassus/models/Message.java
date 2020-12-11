@@ -10,6 +10,7 @@ import lombok.Data;
 public class Message {
     private String id;
     private String host;
+    private Type type;
     private int port;
     private int measurement;
     private Long scalarTime;

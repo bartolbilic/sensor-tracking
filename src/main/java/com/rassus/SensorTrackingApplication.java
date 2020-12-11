@@ -1,7 +1,9 @@
 package com.rassus;
 
-import com.rassus.constants.SocketManagerConstants;
-import com.rassus.models.Message;
+import com.rassus.socket.managers.ClientSocketManager;
+import com.rassus.socket.managers.ClientSocketManagerImpl;
+import com.rassus.socket.managers.ServerSocketManager;
+import com.rassus.socket.managers.SocketManager;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -10,25 +12,17 @@ import java.io.IOException;
 public class SensorTrackingApplication {
     public static void main(String args[]) {
         try {
-            StupidUDPClient udpClient = new StupidUDPClient();
-            udpClient.startServer();
+            SocketManager socketManager = new SocketManager();
 
-            while (true) {
-                for (int i = 0; i < 4; i++) {
-                    if (i != udpClient.index()) {
-                        Message message = udpClient.toMessage(544,
-                                SocketManagerConstants.PORTS[i]);
-                        udpClient.sendMessage(message);
-                        udpClient.saveMessage(message);
-                    }
-                }
-                Thread.sleep(5000);
+            ClientSocketManager clientSocketManager =
+                    new ClientSocketManagerImpl(socketManager);
 
-                for (Message message : udpClient.getSentMessages().values()) {
-                    udpClient.sendMessage(message);
-                }
-            }
-        } catch (IOException | InterruptedException e) {
+            ServerSocketManager serverSocketManager = new
+                    ServerSocketManager(socketManager, clientSocketManager);
+
+            serverSocketManager.start();
+            clientSocketManager.start();
+        } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
