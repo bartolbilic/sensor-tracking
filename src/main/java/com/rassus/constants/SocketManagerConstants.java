@@ -1,7 +1,7 @@
 package com.rassus.constants;
 
 public class SocketManagerConstants {
-    public static final int PORT = 4000;
+    public static final int PORT = 6000;
     public static final double LOSS_RATE = 0.3;
     public static final int AVERAGE_DELAY = 1000;
     public static final String HOST = "localhost";

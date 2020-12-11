@@ -1,4 +1,5 @@
 package com.rassus.utils;
+
 import com.rassus.models.Measurement;
 
 import java.io.BufferedReader;
@@ -37,9 +38,6 @@ public class MeasurementReader {
         String valueString = readLine();
 
         String[] headers = headerString.split(",");
-        if(valueString == null) {
-            System.out.println("UZAS TESKI");
-        }
         String[] values = valueString.split(",");
 
         for (int i = 0; i < headers.length; i++) {
@@ -58,7 +56,8 @@ public class MeasurementReader {
     private String readHeaders() {
         String line = null;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(new File("/Users/luka/Faks/semes1ar/rassus/zad2/sensor-tracking/src/main/resources/data.csv")))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(new File(
+                MeasurementReader.class.getClassLoader().getResource("data.csv").getPath())))) {
             line = reader.readLine();
         } catch (IOException ignored) {
 
@@ -71,8 +70,8 @@ public class MeasurementReader {
         int lineNumber = generateLineNumber();
         //System.out.println("Line number generated: " + lineNumber);
         String line = null;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(new File("/Users/luka/Faks/semes1ar/rassus/zad2/sensor-tracking/src/main/resources/data.csv")))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(new File(
+                MeasurementReader.class.getClassLoader().getResource("data.csv").getPath())))) {
             for (int i = 0; i <= lineNumber; i++) {
                 line = reader.readLine();
             }
