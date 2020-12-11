@@ -4,10 +4,16 @@ import com.google.gson.Gson;
 import com.rassus.models.Message;
 import com.rassus.models.Type;
 import com.rassus.utils.DatagramPacketConverter;
+import com.rassus.utils.VectorTimeComparator;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.rassus.constants.SocketManagerConstants.PORT;
 
@@ -36,11 +42,11 @@ public class ServerSocketManager {
 
     private void processRequest(Message message) throws IOException {
         if (socketManager.isNewMessage(message)) {
-            log.info("[" + PORT + "] RECV NEW MESSAGE-" + message.getId() +
-                    " Measurement: " + message.getMeasurement());
+            //log.info("[" + PORT + "] RECV NEW MESSAGE-" + message.getId() +
+            //        " Measurement: " + message.getMeasurement());
             socketManager.setToConfirmed(message);
         } else {
-            log.info("[" + PORT + "] RECV OLD MESSAGE-" + message.getId());
+            //log.info("[" + PORT + "] RECV OLD MESSAGE-" + message.getId());
         }
 
         clientSocketManager.send(Message.builder()
@@ -52,7 +58,7 @@ public class ServerSocketManager {
     }
 
     private void processConfirmation(Message message) {
-        log.info("[" + PORT + "] RECV CONFIRMATION-" + message.getId());
+        //log.info("[" + PORT + "] RECV CONFIRMATION-" + message.getId());
         socketManager.setToConfirmed(message.getId());
     }
 
@@ -80,7 +86,62 @@ public class ServerSocketManager {
         socketManager.getSocket().close();
     }
 
+    private void sortByPhysicalClock() {
+        List<Message> allMessages = new ArrayList<>(socketManager.getConfirmedMessages().values());
+        allMessages.addAll(socketManager.getSentMessages().values());
+
+        List<Message> sorted = allMessages.stream()
+                .sorted(Comparator.comparingLong(Message::getScalarTime))
+                .collect(Collectors.toList());
+
+        log.info("Measurements sorted by scalar time in last 5 seconds:\n");
+        printFormatted(sorted);
+    }
+
+    private void sortByLogicalClock() {
+        List<Message> allMessages = new ArrayList<>(socketManager.getConfirmedMessages().values());
+        allMessages.addAll(socketManager.getSentMessages().values());
+
+        VectorTimeComparator comparator = new VectorTimeComparator();
+        List<Message> sorted = allMessages.stream()
+                .sorted((t1, t2) -> comparator.compare(t1.getVectorTime(), t2.getVectorTime()))
+                .collect(Collectors.toList());
+
+        log.info("Measurements sorted by logical time in last 5 seconds:\n");
+        printFormatted(sorted);
+    }
+
+    private void printFormatted(List<Message> messages) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Message message : messages) {
+            sb.append("Measurement: ")
+                    .append(message.getMeasurement())
+                    .append(" Scalar time: ")
+                    .append(message.getScalarTime())
+                    .append(" Logical time: ")
+                    .append(Arrays.toString(message.getVectorTime()))
+                    .append("\n");
+        }
+
+        log.info(sb.toString());
+    }
+
+    private void sort() {
+        while (true) {
+            try {
+                Thread.sleep(5000);
+                sortByPhysicalClock();
+                sortByLogicalClock();
+                socketManager.getConfirmedMessages().clear();
+            } catch (InterruptedException e) {
+                log.error(e.getMessage());
+            }
+        }
+    }
+
     public void start() {
+        new Thread(this::sort).start();
         new Thread(this::run).start();
     }
 }

@@ -26,7 +26,7 @@ public class MeasurementReader {
     }
 
     private void generateNewMeasurements() {
-        System.out.println("Starting measurement procedure...");
+        //System.out.println("Starting measurement procedure...");
         measurements = parseLineToMeasurements();
     }
 
@@ -66,7 +66,7 @@ public class MeasurementReader {
 
     private String readLine() {
         int lineNumber = generateLineNumber();
-        System.out.println("Line number generated: " + lineNumber);
+        //System.out.println("Line number generated: " + lineNumber);
         String line = null;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(new File("/Users/bartol/IdeaProjects/sensor-tracking/src/main/resources/data.csv")))) {
@@ -83,7 +83,7 @@ public class MeasurementReader {
 
     private int generateLineNumber() {
         int timeElapsedSeconds = Stopwatch.getTimeElapsedSeconds();
-        System.out.println("Time elapsed in seconds: " + timeElapsedSeconds);
+        //System.out.println("Time elapsed in seconds: " + timeElapsedSeconds);
         return timeElapsedSeconds % 100 + 2;
     }
 

@@ -25,7 +25,7 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
 
     @Override
     public void send(Message message) throws IOException {
-        log.info("[" + PORT + "] SEND " + message.getType() + "-" + message.getId() + " TO " + message.getPort());
+        //log.info("[" + PORT + "] SEND " + message.getType() + "-" + message.getId() + " TO " + message.getPort());
         //log.info("[" + PORT + "] SEND: " + socketManager.getSentMessages().size() +
         //        ", CONFIRMED: " + socketManager.getConfirmedMessages().size() +
         //        ", RATIO: " + ((double) socketManager.getConfirmedMessages().size() / (socketManager.getSentMessages().size() + 1)));
