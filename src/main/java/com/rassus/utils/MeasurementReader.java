@@ -11,7 +11,13 @@ import java.util.List;
 public class MeasurementReader {
     private static List<Measurement> measurements;
 
-    public List<Measurement> getMeasurements() {
+    public Measurement getMeasurement(String key) {
+        return getMeasurements().stream()
+                .filter(t -> t.getName().equals(key))
+                .findFirst().orElse(null);
+    }
+
+    private List<Measurement> getMeasurements() {
         if (measurements == null || measurements.isEmpty()) {
             return parseLineToMeasurements();
         }
@@ -19,7 +25,7 @@ public class MeasurementReader {
         return measurements;
     }
 
-    public void generateNewMeasurements() {
+    private void generateNewMeasurements() {
         System.out.println("Starting measurement procedure...");
         measurements = parseLineToMeasurements();
     }
@@ -49,7 +55,7 @@ public class MeasurementReader {
     private String readHeaders() {
         String line = null;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(new File("/home/bb/Documents/sensor-client/src/main/resources/data.csv")))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(new File("/Users/bartol/IdeaProjects/sensor-tracking/src/main/resources/data.csv")))) {
             line = reader.readLine();
         } catch (IOException ignored) {
 
@@ -63,7 +69,7 @@ public class MeasurementReader {
         System.out.println("Line number generated: " + lineNumber);
         String line = null;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(new File("/home/bb/Documents/sensor-client/src/main/resources/data.csv")))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(new File("/Users/bartol/IdeaProjects/sensor-tracking/src/main/resources/data.csv")))) {
             for (int i = 0; i <= lineNumber; i++) {
                 line = reader.readLine();
             }

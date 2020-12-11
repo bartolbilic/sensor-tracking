@@ -12,7 +12,7 @@ public class Message {
     private String host;
     private Type type;
     private int port;
-    private int measurement;
+    private float measurement;
     private Long scalarTime;
     private int[] vectorTime;
 }

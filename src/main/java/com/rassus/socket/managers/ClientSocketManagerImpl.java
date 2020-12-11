@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.rassus.models.Message;
 import com.rassus.models.Type;
 import com.rassus.utils.DatagramPacketConverter;
+import com.rassus.utils.MeasurementReader;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -15,9 +16,11 @@ import static com.rassus.constants.SocketManagerConstants.*;
 public class ClientSocketManagerImpl implements ClientSocketManager {
     private final SocketManager socketManager;
     private final Gson gson = new Gson();
+    private final MeasurementReader measurementReader;
 
     public ClientSocketManagerImpl(SocketManager socketManager) {
         this.socketManager = socketManager;
+        this.measurementReader = new MeasurementReader();
     }
 
     @Override
@@ -31,7 +34,7 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
                         message.getPort()));
     }
 
-    private void send(int data, int port) throws IOException {
+    private void send(float data, int port) throws IOException {
         Message message = toMessage(data, port);
         send(message);
         socketManager.setToSent(message);
@@ -41,7 +44,7 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
     private void sendMessagesToPeers() throws IOException {
         for (int i = 0; i < 4; i++) {
             if (i != socketManager.index()) {
-                send(544, PORTS[i]);
+                send(measurementReader.getMeasurement("CO").getValue(), PORTS[i]);
             }
         }
     }
@@ -65,7 +68,7 @@ public class ClientSocketManagerImpl implements ClientSocketManager {
         }
     }
 
-    private Message toMessage(int measurement, int port) {
+    private Message toMessage(float measurement, int port) {
         return Message.builder()
                 .id(UUID.randomUUID().toString())
                 .host(HOST)

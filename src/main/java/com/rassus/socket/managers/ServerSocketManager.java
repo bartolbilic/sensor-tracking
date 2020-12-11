@@ -36,7 +36,8 @@ public class ServerSocketManager {
 
     private void processRequest(Message message) throws IOException {
         if (socketManager.isNewMessage(message)) {
-            log.info("[" + PORT + "] RECV NEW MESSAGE-" + message.getId());
+            log.info("[" + PORT + "] RECV NEW MESSAGE-" + message.getId() +
+                    " Measurement: " + message.getMeasurement());
             socketManager.setToConfirmed(message);
         } else {
             log.info("[" + PORT + "] RECV OLD MESSAGE-" + message.getId());
