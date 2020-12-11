@@ -88,4 +88,8 @@ public class SocketManager {
         throw new RuntimeException("Check your PORTS array. Didn't find " + PORT);
     }
 
+    public void clearConfirmedMessages() {
+        confirmedMessages.clear();
+    }
+
 }

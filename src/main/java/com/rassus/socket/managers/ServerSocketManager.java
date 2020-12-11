@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.rassus.constants.SocketManagerConstants.PORT;
@@ -44,7 +43,7 @@ public class ServerSocketManager {
     private void processRequest(Message message) throws IOException {
         if (socketManager.isNewMessage(message)) {
             //log.info("[" + PORT + "] RECV NEW MESSAGE-" + message.getId() +
-            //        " Measurement: " + message.getMeasurement());
+            //       " Measurement: " + message.getMeasurement());
             socketManager.setToConfirmed(message);
         } else {
             //log.info("[" + PORT + "] RECV OLD MESSAGE-" + message.getId());
@@ -60,7 +59,7 @@ public class ServerSocketManager {
     }
 
     private void processConfirmation(Message message) {
-        //log.info("[" + PORT + "] RECV CONFIRMATION-" + message.getId());
+        log.info("[" + PORT + "] RECV CONFIRMATION-" + message.getId());
         socketManager.setToConfirmed(message.getId());
     }
 
@@ -93,11 +92,12 @@ public class ServerSocketManager {
 
         List<Message> sorted = allMessages.stream()
                 .filter(t -> t != null)
+                .filter(t -> t.getVectorTime() != null)
                 .sorted(Comparator.comparingLong(Message::getScalarTime))
                 .collect(Collectors.toList());
 
-        log.info("Measurements sorted by scalar time in last 5 seconds:\n");
-        printFormatted(sorted);
+        //log.info("Measurements sorted by scalar time in last 5 seconds:\n");
+        //printFormatted(sorted);
     }
 
     private void sortByLogicalClock() {
@@ -108,11 +108,12 @@ public class ServerSocketManager {
         VectorTimeComparator comparator = new VectorTimeComparator();
         List<Message> sorted = allMessages.stream()
                 .filter(t -> t != null)
+                .filter(t -> t.getVectorTime() != null)
                 .sorted((t1, t2) -> comparator.compare(t1.getVectorTime(), t2.getVectorTime()))
                 .collect(Collectors.toList());
 
-        log.info("Measurements sorted by logical time in last 5 seconds:\n");
-        printFormatted(sorted);
+        //log.info("Measurements sorted by logical time in last 5 seconds:\n");
+        //printFormatted(sorted);
     }
 
     private void printFormatted(List<Message> messages) {
@@ -125,7 +126,7 @@ public class ServerSocketManager {
                     .append(message.getScalarTime())
                     .append(" Logical time: ")
                     .append(Arrays.toString(message.getVectorTime()))
-                    .append(" Send to: " )
+                    .append(" Send to: ")
                     .append(message.getPort())
                     .append("\n");
             log.info(sb.toString());
@@ -139,7 +140,7 @@ public class ServerSocketManager {
                 Thread.sleep(5000);
                 sortByPhysicalClock();
                 sortByLogicalClock();
-                socketManager.getConfirmedMessages().clear();
+                socketManager.clearConfirmedMessages();
             } catch (InterruptedException e) {
                 log.error(e.getMessage());
             }
