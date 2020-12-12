@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.rassus.constants.SocketManagerConstants.PORT;
@@ -86,39 +83,46 @@ public class ServerSocketManager {
         socketManager.getSocket().close();
     }
 
-    private void sortByPhysicalClock() {
-        List<Message> allMessages = new ArrayList<>(socketManager.getConfirmedMessages().values());
-        allMessages.addAll(socketManager.getSentMessages().values());
-
-        List<Message> sorted = allMessages.stream()
-                .filter(t -> t != null)
+    private void sortByPhysicalClock(List<Message> messages) {
+        List<Message> sorted = messages.stream()
+                .filter(Objects::nonNull)
                 .filter(t -> t.getVectorTime() != null)
                 .sorted(Comparator.comparingLong(Message::getScalarTime))
                 .collect(Collectors.toList());
 
-        log.info("[" + PORT + "] 5 secs passed, physical clock sorting\n");
+        log.info("[" + PORT + "] Sorted by PHYSICAL CLOCK:");
         printFormatted(sorted);
     }
 
-    private void sortByLogicalClock() {
-        List<Message> allMessages = new ArrayList<>();
-        allMessages.addAll(socketManager.getConfirmedMessages().values());
-        allMessages.addAll(socketManager.getSentMessages().values());
-
+    private void sortByLogicalClock(List<Message> messages) {
         VectorTimeComparator comparator = new VectorTimeComparator();
-        List<Message> sorted = allMessages.stream()
-                .filter(t -> t != null)
+        List<Message> sorted = messages.stream()
+                .filter(Objects::nonNull)
                 .filter(t -> t.getVectorTime() != null)
                 .sorted((t1, t2) -> comparator.compare(t1.getVectorTime(), t2.getVectorTime()))
                 .collect(Collectors.toList());
 
-        log.info("[" + PORT + "] 5 secs passed, logical clock sorting\n");
+        log.info("[" + PORT + "] Sorted by LOGICAL CLOCK:");
         printFormatted(sorted);
+    }
+
+    private List<Message> getAllMessages() {
+        List<Message> allMessages = new ArrayList<>(socketManager.getConfirmedMessages().values());
+        allMessages.addAll(socketManager.getSentMessages().values());
+        return allMessages;
+    }
+
+    private double getAvgValue(List<Message> messages) {
+        return messages.stream()
+                .collect(Collectors.averagingDouble(Message::getMeasurement));
     }
 
     private void printFormatted(List<Message> messages) {
         for (Message message : messages) {
-            log.info(Arrays.toString(message.getVectorTime()));
+            log.info("ID: " + message.getId());
+            log.info("Logical clock: " + Arrays.toString(message.getVectorTime()));
+            log.info("Physical clock: " + message.getScalarTime());
+            log.info("Value: " + message.getMeasurement() + "\n");
         }
     }
 
@@ -126,8 +130,11 @@ public class ServerSocketManager {
         while (true) {
             try {
                 Thread.sleep(5000);
-                sortByPhysicalClock();
-                sortByLogicalClock();
+                List<Message> allMessages = getAllMessages();
+                sortByPhysicalClock(allMessages);
+                sortByLogicalClock(allMessages);
+                double avgValue = getAvgValue(allMessages);
+                log.info(avgValue + "");
                 socketManager.clearConfirmedMessages();
             } catch (InterruptedException e) {
                 log.error(e.getMessage());
