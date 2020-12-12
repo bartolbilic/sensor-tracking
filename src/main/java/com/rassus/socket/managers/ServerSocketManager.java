@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,7 +58,7 @@ public class ServerSocketManager {
     }
 
     private void processConfirmation(Message message) {
-        log.info("[" + PORT + "] RECV CONFIRMATION-" + message.getId());
+        //log.info("[" + PORT + "] RECV CONFIRMATION-" + message.getId());
         socketManager.setToConfirmed(message.getId());
     }
 
@@ -96,8 +95,7 @@ public class ServerSocketManager {
                 .sorted(Comparator.comparingLong(Message::getScalarTime))
                 .collect(Collectors.toList());
 
-        //log.info("Measurements sorted by scalar time in last 5 seconds:\n");
-        //printFormatted(sorted);
+        log.info("[" + PORT + "] 5 secs passed, physical clock sorting\n");
     }
 
     private void sortByLogicalClock() {
@@ -112,26 +110,7 @@ public class ServerSocketManager {
                 .sorted((t1, t2) -> comparator.compare(t1.getVectorTime(), t2.getVectorTime()))
                 .collect(Collectors.toList());
 
-        //log.info("Measurements sorted by logical time in last 5 seconds:\n");
-        //printFormatted(sorted);
-    }
-
-    private void printFormatted(List<Message> messages) {
-        StringBuilder sb = new StringBuilder();
-
-        for (Message message : messages) {
-            sb.append("Measurement: ")
-                    .append(message.getMeasurement())
-                    .append(" Scalar time: ")
-                    .append(message.getScalarTime())
-                    .append(" Logical time: ")
-                    .append(Arrays.toString(message.getVectorTime()))
-                    .append(" Send to: ")
-                    .append(message.getPort())
-                    .append("\n");
-            log.info(sb.toString());
-            sb = new StringBuilder();
-        }
+        log.info("[" + PORT + "] 5 secs passed, logical clock sorting\n");
     }
 
     private void sort() {
