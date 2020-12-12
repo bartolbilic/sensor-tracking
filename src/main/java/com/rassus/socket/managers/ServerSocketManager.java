@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -96,6 +97,7 @@ public class ServerSocketManager {
                 .collect(Collectors.toList());
 
         log.info("[" + PORT + "] 5 secs passed, physical clock sorting\n");
+        printFormatted(sorted);
     }
 
     private void sortByLogicalClock() {
@@ -111,6 +113,13 @@ public class ServerSocketManager {
                 .collect(Collectors.toList());
 
         log.info("[" + PORT + "] 5 secs passed, logical clock sorting\n");
+        printFormatted(sorted);
+    }
+
+    private void printFormatted(List<Message> messages) {
+        for (Message message : messages) {
+            log.info(Arrays.toString(message.getVectorTime()));
+        }
     }
 
     private void sort() {

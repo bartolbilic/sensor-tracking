@@ -5,49 +5,35 @@ import java.util.Comparator;
 public class VectorTimeComparator implements Comparator<int[]> {
     @Override
     public int compare(int[] t1, int[] t2) {
+        if (t1 == null || t2 == null) {
+            throw new IllegalArgumentException("Null values aren't allowed");
+        }
+
         if (t1.length != t2.length) {
             throw new RuntimeException("Vector time lengths don't match");
         }
 
-        int[] results = new int[4];
-
+        boolean isAGreater = true;
         for (int i = 0; i < t1.length; i++) {
-
-            if (t1[i] == t2[i]) {
-                results[i] = 0;
-            }
-
             if (t1[i] < t2[i]) {
-                results[i] = -1;
-            }
-
-            if (t1[i] > t2[i]) {
-                results[i] = 1;
+                isAGreater = false;
+                break;
             }
         }
 
-        boolean hasNegative = false;
-        boolean hasPositive = false;
-
-        for (int i = 0; i < 4; i++) {
-            if (results[i] < 0) {
-                hasNegative = true;
-            }
-
-            if (results[i] > 0) {
-                hasPositive = true;
-            }
-        }
-
-        if (hasNegative && hasPositive) {
-            return 0;
-        }
-
-        if (hasNegative) {
+        if (isAGreater) {
             return -1;
         }
 
-        if (hasPositive) {
+        boolean isBGreater = true;
+        for (int i = 0; i < t1.length; i++) {
+            if (t2[i] < t1[i]) {
+                isBGreater = false;
+                break;
+            }
+        }
+
+        if (isBGreater) {
             return 1;
         }
 

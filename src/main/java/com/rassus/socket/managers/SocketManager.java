@@ -1,6 +1,5 @@
 package com.rassus.socket.managers;
 
-import com.google.gson.Gson;
 import com.rassus.models.Message;
 import com.rassus.socket.SimpleSimulatedDatagramSocket;
 import com.rassus.utils.EmulatedSystemClock;
@@ -8,10 +7,8 @@ import lombok.Getter;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import static com.rassus.constants.SocketManagerConstants.*;
