@@ -11,14 +11,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class VectorTimeComparatorTest {
 
-    int[] a = {30, 30, 30, 30};
-    int[] b = {0, 0, 2, 0};
-    int[] c = {3, 0, 2, 0};
-    int[] d = {0, 0, 2, 1};
+    int[] a = {0, 0, 0, 1};
+    int[] b = {0, 0, 0, 2};
+    int[] c = {0, 2, 0, 5};
+    int[] d = {0, 5, 0, 2};
+    int[] e = {0, 0, 0, 3};
+    int[] f = {0, 2, 0, 1};
+    int[] g = {0, 3, 5, 3};
 
-
-
-    private ArrayList<int[]> list = Lists.newArrayList(a, b, c, d);
+    private ArrayList<int[]> list = Lists.newArrayList(a, b, c, d, e, f, g);
 
 
     @Test
@@ -30,7 +31,7 @@ class VectorTimeComparatorTest {
     }
 
     private void print(List<int[]> list) {
-        for(int[] array : list) {
+        for (int[] array : list) {
             System.out.println(Arrays.toString(array));
         }
     }

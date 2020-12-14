@@ -3,8 +3,8 @@ package com.rassus.socket.managers;
 import com.google.gson.Gson;
 import com.rassus.models.Message;
 import com.rassus.models.Type;
+import com.rassus.utils.BinarySearchTree;
 import com.rassus.utils.DatagramPacketConverter;
-import com.rassus.utils.VectorTimeComparator;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -95,12 +95,11 @@ public class ServerSocketManager {
     }
 
     private void sortByLogicalClock(List<Message> messages) {
-        VectorTimeComparator comparator = new VectorTimeComparator();
-        List<Message> sorted = messages.stream()
+        List<Message> notSorted = messages.stream()
                 .filter(Objects::nonNull)
                 .filter(t -> t.getVectorTime() != null)
-                .sorted((t1, t2) -> comparator.compare(t1.getVectorTime(), t2.getVectorTime()))
                 .collect(Collectors.toList());
+        List<Message> sorted = BinarySearchTree.sort(notSorted);
 
         log.info("[" + PORT + "] Sorted by LOGICAL CLOCK:");
         printFormatted(sorted);

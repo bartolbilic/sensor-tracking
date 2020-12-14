@@ -22,7 +22,7 @@ public class VectorTimeComparator implements Comparator<int[]> {
         }
 
         if (isAGreater) {
-            return -1;
+            return 1;
         }
 
         boolean isBGreater = true;
@@ -34,7 +34,7 @@ public class VectorTimeComparator implements Comparator<int[]> {
         }
 
         if (isBGreater) {
-            return 1;
+            return -1;
         }
 
         return 0;
